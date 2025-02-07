@@ -24,7 +24,7 @@
             </span>
           </h1>
         </div>
-        <!-- Search Box -->
+        <!-- Search Box (also used for admin easter egg) -->
         <div class="w-full sm:w-auto">
           <input
             v-model="searchTerm"
@@ -101,7 +101,7 @@
               class="inline-block w-3 h-3 sm:w-4 sm:h-4 rounded-full mr-2"
               :style="{ backgroundColor: selectedName.color }"
             ></span>
-            <span v-if="selectedName">{{ selectedName.name }}</span>
+            <span v-if="selectedName" :class="{ 'line-through': selectedName.submitted }">{{ selectedName.name }}</span>
             <span v-else>Select Your Name</span>
           </div>
           <div
@@ -224,6 +224,98 @@
             GENERATE AGENDA
           </button>
         </div>
+        <!-- Generated Agenda Section -->
+        <div v-if="currentPage==='leaderboard' && showAgenda" class="mt-12 text-left">
+          <h2 class="text-4xl font-bold mb-8">Meeting Agenda</h2>
+          <!-- New Additions Section -->
+          <div class="mb-8">
+            <h3 class="text-3xl font-bold mb-4">New Additions</h3>
+            <div
+              v-for="(contributions, name) in groupedAgendaNewAdditions"
+              :key="name"
+              class="max-w-2xl mb-4 p-4 border rounded shadow-sm bg-white"
+            >
+              <div class="flex items-center mb-2">
+                <span class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: getUserColor(name) }"></span>
+                <span class="font-bold text-xl">{{ name }}</span>
+              </div>
+              <div class="whitespace-pre-wrap text-lg" v-for="(item, index) in contributions" :key="index">
+                {{ item }}
+              </div>
+            </div>
+          </div>
+          <!-- Deals To Go Out Section -->
+          <div class="mb-8">
+            <h3 class="text-3xl font-bold mb-4">Deals To Go Out</h3>
+            <div
+              v-for="(contributions, name) in groupedAgendaDealsToGoOut"
+              :key="name"
+              class="max-w-2xl mb-4 p-4 border rounded shadow-sm bg-white"
+            >
+              <div class="flex items-center mb-2">
+                <span class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: getUserColor(name) }"></span>
+                <span class="font-bold text-xl">{{ name }}</span>
+              </div>
+              <div class="whitespace-pre-wrap text-lg" v-for="(item, index) in contributions" :key="index">
+                {{ item }}
+              </div>
+            </div>
+          </div>
+          <!-- Outreach Updates Section -->
+          <div class="mb-8">
+            <h3 class="text-3xl font-bold mb-4">Outreach Updates</h3>
+            <div
+              v-for="(contributions, name) in groupedAgendaOutreachUpdates"
+              :key="name"
+              class="max-w-2xl mb-4 p-4 border rounded shadow-sm bg-white"
+            >
+              <div class="flex items-center mb-2">
+                <span class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: getUserColor(name) }"></span>
+                <span class="font-bold text-xl">{{ name }}</span>
+              </div>
+              <div class="whitespace-pre-wrap text-lg" v-for="(item, index) in contributions" :key="index">
+                {{ item }}
+              </div>
+            </div>
+          </div>
+          <!-- Deals Out With Updates Section -->
+          <div class="mb-8">
+            <h3 class="text-3xl font-bold mb-4">Deals Out With Updates</h3>
+            <div
+              v-for="(contributions, name) in groupedAgendaDealsOutWithUpdates"
+              :key="name"
+              class="max-w-2xl mb-4 p-4 border rounded shadow-sm bg-white"
+            >
+              <div class="flex items-center mb-2">
+                <span class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: getUserColor(name) }"></span>
+                <span class="font-bold text-xl">{{ name }}</span>
+              </div>
+              <div class="whitespace-pre-wrap text-lg" v-for="(item, index) in contributions" :key="index">
+                {{ item }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div v-if="isAdmin" class="p-4 bg-gray-200 mt-8 rounded">
+          <h2 class="text-xl font-bold mb-2">Admin Panel</h2>
+          <ul>
+            <li
+              v-for="submission in weeklySubmissions"
+              :key="submission.id"
+              class="mb-2 flex items-center justify-between border p-2 rounded"
+            >
+              <span>{{ submission.name }} — {{ formatDate(submission.timestamp) }}</span>
+              <button
+                @click="deleteSubmission(submission.id)"
+                class="bg-red-600 text-amber-50 px-3 py-1 rounded text-sm"
+              >
+                Delete Submission
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <!-- ADDITIONS PAGE -->
@@ -335,8 +427,10 @@ import {
   updateDoc,
   doc,
   setDoc,
-  arrayUnion
+  arrayUnion,
+  deleteDoc
 } from "firebase/firestore";
+
 export default {
   name: "MinimalForm",
   data() {
@@ -369,11 +463,12 @@ export default {
       artistComments: {},
       showAgenda: false,
       searchTerm: "",
-      isAdmin: false
+      isAdmin: false,
+      // For demo purposes, we'll assume isMeetingArchived is false.
+      isMeetingArchived: false
     };
   },
   computed: {
-    // Format a Date object into "YYYY/MM/DD"
     formatLocalDate() {
       return (date) => {
         const year = date.getFullYear();
@@ -382,10 +477,9 @@ export default {
         return `${year}/${month}/${day}`;
       };
     },
-    // Compute next meeting date raw string "YYYY/MM/DD"
     nextMeetingDateRaw() {
       const today = new Date();
-      const day = today.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+      const day = today.getDay();
       if (day === 2 || day === 5) {
         return this.formatLocalDate(today);
       }
@@ -395,7 +489,6 @@ export default {
       const meetingDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + meetingOffset);
       return this.formatLocalDate(meetingDate);
     },
-    // Display string: "Today" if computed date equals today; otherwise formatted date.
     nextMeetingDisplay() {
       const todayStr = this.formatLocalDate(new Date());
       if (this.nextMeetingDateRaw === todayStr) {
@@ -457,27 +550,32 @@ export default {
       });
       return groups;
     },
-    allParsedAdditions() {
+    groupedAgendaDealsToGoOut() {
       const groups = {};
-      this.allSubmissions.forEach((sub) => {
-        if (sub.newAdditions) {
-          const lines = sub.newAdditions.split(/\r?\n/);
-          lines.forEach((line) => {
-            const trimmed = line.trim();
-            if (!trimmed) return;
-            const match = trimmed.match(/^(.+?):\s*(.+)$/);
-            if (match) {
-              const artist = match[1].trim();
-              const comment = match[2];
-              if (!groups[artist]) groups[artist] = [];
-              groups[artist].push({
-                comment,
-                contributor: sub.name,
-                timestamp: sub.timestamp,
-                submissionId: sub.id
-              });
-            }
-          });
+      this.weeklySubmissions.forEach((sub) => {
+        if (sub.dealsToGoOut && sub.dealsToGoOut.trim() !== "") {
+          if (!groups[sub.name]) groups[sub.name] = [];
+          groups[sub.name].push(sub.dealsToGoOut);
+        }
+      });
+      return groups;
+    },
+    groupedAgendaOutreachUpdates() {
+      const groups = {};
+      this.weeklySubmissions.forEach((sub) => {
+        if (sub.outreachUpdates && sub.outreachUpdates.trim() !== "") {
+          if (!groups[sub.name]) groups[sub.name] = [];
+          groups[sub.name].push(sub.outreachUpdates);
+        }
+      });
+      return groups;
+    },
+    groupedAgendaDealsOutWithUpdates() {
+      const groups = {};
+      this.weeklySubmissions.forEach((sub) => {
+        if (sub.dealsOutWithUpdates && sub.dealsOutWithUpdates.trim() !== "") {
+          if (!groups[sub.name]) groups[sub.name] = [];
+          groups[sub.name].push(sub.dealsOutWithUpdates);
         }
       });
       return groups;
@@ -486,8 +584,6 @@ export default {
       return process.env.NODE_ENV === "production";
     },
     currentLeaderboard() {
-      // For simplicity, if leaderboardTab is "most", use parsedLeaderboard,
-      // otherwise, use leaderboardFastestAdds.
       return this.leaderboardTab === "most" ? this.parsedLeaderboard : this.leaderboardFastestAdds;
     }
   },
@@ -495,7 +591,6 @@ export default {
     searchTerm(newVal) {
       if (newVal === "letmeinadmin") {
         this.isAdmin = true;
-        // Optionally clear the search box so the secret isn't visible.
         this.searchTerm = "";
       }
     }
@@ -539,6 +634,13 @@ export default {
       try {
         const submissions = await this.fetchMeetingSubmissions();
         this.weeklySubmissions = submissions;
+
+        // Update submitted flag for names based on current meeting submissions.
+        this.names = this.names.map(user => ({
+          ...user,
+          submitted: submissions.some(sub => sub.name === user.name)
+        }));
+
         const fastestTimes = {};
         submissions.forEach((sub) => {
           const subTime = sub.timestamp.seconds;
@@ -615,6 +717,13 @@ export default {
             timestamp: new Date()
           });
         }
+        // Mark the user as submitted so their name is crossed out in the dropdown.
+        this.names = this.names.map(user => {
+          if (user.name === this.selectedName.name) {
+            return { ...user, submitted: true };
+          }
+          return user;
+        });
         await this.loadMeetingData();
         this.currentPage = "leaderboard";
       } catch (error) {
@@ -722,6 +831,16 @@ export default {
     deleteParsedContribution(submissionId, contributionIndex) {
       console.log(`Request to delete contribution #${contributionIndex} from submission ${submissionId}`);
       alert("Delete functionality is not fully implemented in this demo.");
+    },
+    async deleteSubmission(submissionId) {
+      if (confirm("Are you sure you want to delete this submission?")) {
+        try {
+          await deleteDoc(doc(db, "adds", submissionId));
+          await this.loadMeetingData();
+        } catch (error) {
+          console.error("Error deleting submission:", error);
+        }
+      }
     }
   },
   async mounted() {
