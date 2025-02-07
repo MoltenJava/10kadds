@@ -1,13 +1,13 @@
 <template>
   <div class="min-h-screen bg-amber-50 text-gray-900">
     <!-- HEADER: Date, Search, Navigation -->
-    <header class="w-full py-12 bg-amber-100 shadow-md relative">
-      <div class="w-full px-8 flex justify-between items-center">
-        <div>
-          <h1 class="text-6xl font-extrabold tracking-wide text-left">
+    <header class="w-full py-6 sm:py-12 bg-amber-100 shadow-md relative">
+      <div class="w-full px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center">
+        <!-- Title & Next Meeting Date -->
+        <div class="mb-4 sm:mb-0">
+          <h1 class="text-3xl sm:text-6xl font-extrabold tracking-wide text-center sm:text-left">
             10K PROJECTS ADDS FOR
-            <!-- Date wrapped in a relative inline container -->
-            <span class="ml-4 relative inline-block">
+            <span class="ml-2 relative inline-block">
               <span
                 class="cursor-pointer border-b-2 border-dashed border-black"
                 @click="toggleDateDropdown"
@@ -22,7 +22,7 @@
                   <!-- Only one option: the computed next meeting date -->
                   <li
                     @click="selectDate(nextMeetingDateRaw)"
-                    class="px-6 py-3 hover:bg-amber-200 cursor-pointer text-2xl font-extrabold"
+                    class="px-4 py-2 hover:bg-amber-200 cursor-pointer text-lg font-bold"
                   >
                     {{ nextMeetingDisplay }}
                   </li>
@@ -32,35 +32,35 @@
           </h1>
         </div>
         <!-- Search Box -->
-        <div>
+        <div class="w-full sm:w-auto">
           <input
             v-model="searchTerm"
             type="text"
             placeholder="Search..."
-            class="px-4 py-2 border rounded"
+            class="w-full sm:w-64 px-4 py-2 border rounded"
           />
         </div>
       </div>
       <!-- Navigation Buttons -->
-      <div class="w-full px-8 mt-4 flex justify-end space-x-4">
+      <div class="w-full px-4 sm:px-8 mt-4 flex flex-wrap justify-center sm:justify-end gap-2">
         <button
           @click="goToPage('form')"
           :class="currentPage==='form' ? 'bg-gray-900 text-amber-50' : 'bg-gray-200 text-gray-900'"
-          class="px-4 py-2 rounded"
+          class="px-4 py-2 rounded uppercase text-sm"
         >
           Home
         </button>
         <button
           @click="goToPage('leaderboard')"
           :class="currentPage==='leaderboard' ? 'bg-gray-900 text-amber-50' : 'bg-gray-200 text-gray-900'"
-          class="px-4 py-2 rounded"
+          class="px-4 py-2 rounded uppercase text-sm"
         >
           Leaderboard
         </button>
         <button
           @click="goToPage('additions')"
           :class="currentPage==='additions' ? 'bg-gray-900 text-amber-50' : 'bg-gray-200 text-gray-900'"
-          class="px-4 py-2 rounded"
+          class="px-4 py-2 rounded uppercase text-sm"
         >
           Additions
         </button>
@@ -68,8 +68,8 @@
     </header>
 
     <!-- SEARCH RESULTS -->
-    <div v-if="searchTerm.trim() !== ''" class="w-full px-8 mb-8">
-      <h2 class="text-3xl font-bold mb-4">Search Results</h2>
+    <div v-if="searchTerm.trim() !== ''" class="w-full px-4 sm:px-8 mb-8">
+      <h2 class="text-2xl sm:text-3xl font-bold mb-4">Search Results</h2>
       <ul>
         <li
           v-for="(result, index) in searchResults"
@@ -91,21 +91,21 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="w-full px-8 py-16 space-y-12">
-      <!-- FORM PAGE (current meeting) -->
+    <main class="w-full px-4 sm:px-8 py-8 sm:py-16 space-y-8">
+      <!-- FORM PAGE -->
       <div v-if="currentPage==='form'">
         <div v-if="isMeetingArchived" class="text-center text-red-700 font-bold mb-4">
           This meeting is archived. Submissions are no longer editable.
         </div>
-        <!-- Name Dropdown with extra bottom margin -->
-        <div class="relative flex justify-center mb-8" ref="nameDropdownWrapper">
+        <!-- Name Dropdown -->
+        <div class="relative flex justify-center mb-4" ref="nameDropdownWrapper">
           <div
-            class="cursor-pointer text-3xl font-bold border-b-2 border-dashed border-black flex items-center"
+            class="cursor-pointer text-xl sm:text-3xl font-bold border-b-2 border-dashed border-black flex items-center"
             @click="toggleNameDropdown"
           >
             <span
               v-if="selectedName"
-              class="inline-block w-3 h-3 rounded-full mr-2"
+              class="inline-block w-3 h-3 sm:w-4 sm:h-4 rounded-full mr-2"
               :style="{ backgroundColor: selectedName.color }"
             ></span>
             <span v-if="selectedName">{{ selectedName.name }}</span>
@@ -113,18 +113,18 @@
           </div>
           <div
             v-if="nameDropdownOpen"
-            class="absolute mt-3 bg-amber-50 border border-gray-300 rounded shadow-md z-10"
+            class="absolute mt-2 bg-amber-50 border border-gray-300 rounded shadow-md z-10"
           >
             <ul>
               <li
                 v-for="(user, index) in names"
                 :key="index"
                 @click="selectName(user)"
-                class="px-6 py-3 hover:bg-amber-200 cursor-pointer text-3xl font-bold flex items-center"
+                class="px-4 py-2 hover:bg-amber-200 cursor-pointer text-lg font-bold flex items-center"
                 :class="{ 'line-through opacity-50': user.submitted }"
               >
                 <span
-                  class="inline-block w-3 h-3 rounded-full mr-2"
+                  class="inline-block w-3 h-3 sm:w-4 sm:h-4 rounded-full mr-2"
                   :style="{ backgroundColor: user.color }"
                 ></span>
                 {{ user.name }}
@@ -133,76 +133,76 @@
           </div>
         </div>
         <!-- Submission Fields -->
-        <div v-if="selectedName" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div v-if="selectedName" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-2xl font-bold mb-2">New Additions:</label>
+            <label class="block text-lg font-bold mb-1">New Additions:</label>
             <textarea
               v-model="newAdditions"
               :disabled="isMeetingArchived"
-              placeholder="Enter new additions (e.g., Destruction of the cult of the sun: This is a cool band!)"
-              class="w-full bg-amber-50 border border-gray-400 rounded px-4 py-3 text-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none whitespace-pre-wrap"
-              rows="6"
+              placeholder="Enter new additions..."
+              class="w-full p-2 border rounded resize-none"
+              rows="4"
             ></textarea>
           </div>
           <div>
-            <label class="block text-2xl font-bold mb-2">Deals To Go Out:</label>
+            <label class="block text-lg font-bold mb-1">Deals To Go Out:</label>
             <textarea
               v-model="dealsToGoOut"
               :disabled="isMeetingArchived"
               placeholder="Enter deals to go out..."
-              class="w-full bg-amber-50 border border-gray-400 rounded px-4 py-3 text-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none whitespace-pre-wrap"
-              rows="6"
+              class="w-full p-2 border rounded resize-none"
+              rows="4"
             ></textarea>
           </div>
           <div>
-            <label class="block text-2xl font-bold mb-2">Outreach Updates:</label>
+            <label class="block text-lg font-bold mb-1">Outreach Updates:</label>
             <textarea
               v-model="outreachUpdates"
               :disabled="isMeetingArchived"
               placeholder="Enter outreach updates..."
-              class="w-full bg-amber-50 border border-gray-400 rounded px-4 py-3 text-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none whitespace-pre-wrap"
-              rows="6"
+              class="w-full p-2 border rounded resize-none"
+              rows="4"
             ></textarea>
           </div>
           <div>
-            <label class="block text-2xl font-bold mb-2">Deals Out With Updates:</label>
+            <label class="block text-lg font-bold mb-1">Deals Out With Updates:</label>
             <textarea
               v-model="dealsOutWithUpdates"
               :disabled="isMeetingArchived"
               placeholder="Enter deals out with updates..."
-              class="w-full bg-amber-50 border border-gray-400 rounded px-4 py-3 text-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none whitespace-pre-wrap"
-              rows="6"
+              class="w-full p-2 border rounded resize-none"
+              rows="4"
             ></textarea>
           </div>
         </div>
         <!-- Submit Button -->
-        <div v-if="selectedName && !isMeetingArchived" class="flex justify-center mt-8">
+        <div v-if="selectedName && !isMeetingArchived" class="flex justify-center mt-4">
           <button
             type="button"
             @click="handleSubmit"
-            class="bg-gray-900 hover:bg-gray-800 transition duration-300 text-amber-50 font-bold py-5 px-12 rounded uppercase tracking-wider"
+            class="bg-gray-900 hover:bg-gray-800 transition duration-300 text-amber-50 font-bold py-3 px-8 rounded uppercase tracking-wider"
           >
             Submit
           </button>
         </div>
       </div>
 
-      <!-- LEADERBOARD PAGE (current meeting) -->
+      <!-- LEADERBOARD PAGE -->
       <div v-if="currentPage==='leaderboard'">
-        <div class="flex justify-center space-x-4 mb-8">
+        <div class="flex flex-wrap justify-center gap-2 mb-4">
           <button
             @click="leaderboardTab = 'most'"
             :class="leaderboardTab==='most' ? 'bg-gray-900 text-amber-50' : 'bg-gray-200 text-gray-900'"
-            class="px-6 py-3 rounded uppercase font-bold transition"
+            class="px-4 py-2 rounded uppercase font-bold text-sm"
           >
-            This Meeting's Most Adds
+            Most Adds
           </button>
           <button
             @click="leaderboardTab = 'fastest'"
             :class="leaderboardTab==='fastest' ? 'bg-gray-900 text-amber-50' : 'bg-gray-200 text-gray-900'"
-            class="px-6 py-3 rounded uppercase font-bold transition"
+            class="px-4 py-2 rounded uppercase font-bold text-sm"
           >
-            This Meeting's Fastest Adds
+            Fastest Adds
           </button>
         </div>
         <div>
@@ -210,10 +210,10 @@
             <li
               v-for="(entry, index) in currentLeaderboard"
               :key="index"
-              class="flex items-center justify-between border-b border-gray-300 py-4 text-2xl"
+              class="flex items-center justify-between border-b border-gray-300 py-2 text-base sm:text-xl"
             >
               <div class="flex items-center">
-                <span class="inline-block w-4 h-4 rounded-full mr-4" :style="{ backgroundColor: entry.color }"></span>
+                <span class="inline-block w-3 h-3 sm:w-4 sm:h-4 rounded-full mr-2" :style="{ backgroundColor: entry.color }"></span>
                 <span>{{ entry.name }}</span>
               </div>
               <div>
@@ -223,110 +223,35 @@
             </li>
           </ul>
         </div>
-        <div class="flex justify-center mt-8">
+        <div class="flex justify-center mt-4">
           <button
             @click="handleGenerateAgenda"
-            class="bg-blue-600 hover:bg-blue-700 transition duration-300 text-white font-bold py-3 px-8 rounded"
+            class="bg-blue-600 hover:bg-blue-700 transition duration-300 text-white font-bold py-2 px-4 rounded text-sm"
           >
             GENERATE AGENDA
           </button>
         </div>
-        <!-- Generated Agenda (for current meeting) -->
-        <div v-if="showAgenda" class="mt-12 text-left">
-          <h2 class="text-4xl font-bold mb-8">Meeting Agenda</h2>
-          <!-- New Additions Section -->
-          <div class="mb-8">
-            <h3 class="text-3xl font-bold mb-4">New Additions</h3>
-            <div
-              v-for="(contributions, name) in groupedAgendaNewAdditions"
-              :key="name"
-              class="max-w-2xl mb-4 p-4 border rounded shadow-sm bg-white"
-            >
-              <div class="flex items-center mb-2">
-                <span class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: getUserColor(name) }"></span>
-                <span class="font-bold text-xl">{{ name }}</span>
-              </div>
-              <div class="whitespace-pre-wrap text-lg" v-for="(item, index) in contributions" :key="index">
-                {{ item }}
-              </div>
-            </div>
-          </div>
-          <!-- Deals To Go Out Section -->
-          <div class="mb-8">
-            <h3 class="text-3xl font-bold mb-4">Deals To Go Out</h3>
-            <div
-              v-for="(contributions, name) in groupedAgendaDealsToGoOut"
-              :key="name"
-              class="max-w-2xl mb-4 p-4 border rounded shadow-sm bg-white"
-            >
-              <div class="flex items-center mb-2">
-                <span class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: getUserColor(name) }"></span>
-                <span class="font-bold text-xl">{{ name }}</span>
-              </div>
-              <div class="whitespace-pre-wrap text-lg" v-for="(item, index) in contributions" :key="index">
-                {{ item }}
-              </div>
-            </div>
-          </div>
-          <!-- Outreach Updates Section -->
-          <div class="mb-8">
-            <h3 class="text-3xl font-bold mb-4">Outreach Updates</h3>
-            <div
-              v-for="(contributions, name) in groupedAgendaOutreachUpdates"
-              :key="name"
-              class="max-w-2xl mb-4 p-4 border rounded shadow-sm bg-white"
-            >
-              <div class="flex items-center mb-2">
-                <span class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: getUserColor(name) }"></span>
-                <span class="font-bold text-xl">{{ name }}</span>
-              </div>
-              <div class="whitespace-pre-wrap text-lg" v-for="(item, index) in contributions" :key="index">
-                {{ item }}
-              </div>
-            </div>
-          </div>
-          <!-- Deals Out With Updates Section -->
-          <div class="mb-8">
-            <h3 class="text-3xl font-bold mb-4">Deals Out With Updates</h3>
-            <div
-              v-for="(contributions, name) in groupedAgendaDealsOutWithUpdates"
-              :key="name"
-              class="max-w-2xl mb-4 p-4 border rounded shadow-sm bg-white"
-            >
-              <div class="flex items-center mb-2">
-                <span class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: getUserColor(name) }"></span>
-                <span class="font-bold text-xl">{{ name }}</span>
-              </div>
-              <div class="whitespace-pre-wrap text-lg" v-for="(item, index) in contributions" :key="index">
-                {{ item }}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- ADDITIONS PAGE (permanent parsed additions) -->
+      <!-- ADDITIONS PAGE -->
       <div v-if="currentPage==='additions'">
-        <h2 class="text-4xl font-bold text-left mb-8">Additions</h2>
-        <div class="flex flex-wrap justify-start gap-4">
+        <h2 class="text-2xl sm:text-4xl font-bold text-left mb-4">Additions</h2>
+        <div class="flex flex-wrap justify-center gap-4">
           <div
             v-for="(contributions, artist) in allParsedAdditions"
             :key="artist"
-            class="w-full sm:w-1/2 md:w-1/3 p-4 border rounded shadow-sm bg-white mb-6"
+            class="w-full sm:w-1/2 md:w-1/3 p-4 border rounded shadow-sm bg-white"
           >
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center">
+            <div class="flex flex-col sm:flex-row items-start justify-between mb-2">
+              <div class="flex items-center mb-2 sm:mb-0">
                 <span class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: getArtistColor(artist) }"></span>
-                <span class="font-bold text-xl">{{ artist }}</span>
-                <span class="ml-2 text-sm text-gray-600">
-                  [Added on {{ getEarliestAdditionDate(contributions) }}]
-                </span>
+                <span class="font-bold text-lg">{{ artist }}</span>
+                <span class="ml-2 text-sm text-gray-600">[Added on {{ getEarliestAdditionDate(contributions) }}]</span>
               </div>
-              <!-- Status Dropdown -->
               <div>
                 <select
                   v-model="artistStatuses[artist]"
-                  class="bg-transparent border-b-2 border-dashed border-black appearance-none px-2 py-1 text-sm"
+                  class="bg-transparent border-b-2 border-dashed border-black appearance-none px-2 py-1 text-xs"
                 >
                   <option :value="'Added on ' + getEarliestAdditionDate(contributions)">
                     Added on {{ getEarliestAdditionDate(contributions) }}
@@ -340,58 +265,54 @@
                 </select>
               </div>
             </div>
-            <!-- Comment Input -->
             <div class="mb-2">
               <textarea
                 v-model="artistComments[artist]"
                 placeholder="Leave your update..."
-                class="w-full border border-gray-400 rounded px-2 py-1 text-sm whitespace-pre-wrap"
+                class="w-full border border-gray-400 rounded px-2 py-1 text-xs resize-none"
                 rows="2"
               ></textarea>
             </div>
             <div class="flex justify-end mb-2">
               <button
                 @click="postArtistUpdate(artist)"
-                class="bg-green-600 text-amber-50 px-3 py-1 rounded text-sm"
+                class="bg-green-600 text-amber-50 px-3 py-1 rounded text-xs"
               >
                 Post Update
               </button>
             </div>
             <!-- Display Status Updates -->
-            <div v-if="artistAdditions[artist] && artistAdditions[artist].length" class="mt-4">
-              <h4 class="font-bold text-lg mb-2">Status Updates:</h4>
+            <div v-if="artistAdditions[artist] && artistAdditions[artist].length" class="mt-2">
+              <h4 class="font-bold text-base mb-1">Status Updates:</h4>
               <div class="space-y-1">
                 <div
                   v-for="(update, idx) in artistAdditions[artist]"
                   :key="idx"
-                  class="p-2 bg-gray-100 rounded"
+                  class="p-1 bg-gray-100 rounded text-xs"
                 >
                   <div class="font-semibold">{{ update.status }}</div>
-                  <div class="text-sm">{{ update.comment }}</div>
-                  <div class="text-xs text-gray-500">{{ update.date }}</div>
+                  <div>{{ update.comment }}</div>
+                  <div class="text-xs text-gray-500">{{ update.date }} - {{ update.contributor }}</div>
                 </div>
               </div>
             </div>
             <!-- Display Parsed Contributions -->
-            <div class="mt-4">
-              <h4 class="font-bold text-lg mb-2">Parsed Contributions:</h4>
-              <div class="space-y-2">
+            <div class="mt-2">
+              <h4 class="font-bold text-base mb-1">Parsed Contributions:</h4>
+              <div class="space-y-1">
                 <div
                   v-for="(item, index) in contributions"
                   :key="index"
-                  class="p-2 bg-gray-50 rounded border"
+                  class="p-1 bg-gray-50 rounded border text-xs"
                 >
                   <div>{{ item.comment }}</div>
-                  <div class="text-sm text-gray-500">
-                    – from {{ item.contributor }}, {{ formatDate(item.timestamp) }}
-                  </div>
+                  <div class="text-gray-500">– from {{ item.contributor }}, {{ formatDate(item.timestamp) }}</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </main>
   </div>
 </template>
@@ -414,11 +335,8 @@ export default {
   name: "MinimalForm",
   data() {
     return {
-      // Set the selectedDate on mount using our computed next meeting date.
-      // We'll store dates as strings in the format "YYYY/MM/DD" to ensure local parsing.
       selectedDate: "",
       dropdownOpen: false,
-      // Team members.
       names: [
         { name: "Arya", color: "#EF4444", submitted: false },
         { name: "Chris", color: "#F59E0B", submitted: false },
@@ -431,33 +349,24 @@ export default {
       ],
       selectedName: null,
       nameDropdownOpen: false,
-      // Submission fields.
       newAdditions: "",
       dealsToGoOut: "",
       outreachUpdates: "",
       dealsOutWithUpdates: "",
-      // Navigation: 'form', 'leaderboard', or 'additions'.
       currentPage: "form",
-      // Leaderboard state.
       leaderboardTab: "most",
       leaderboardFastestAdds: [],
-      // Meeting submissions for current meeting.
       weeklySubmissions: [],
-      // All submissions for the permanent Additions page.
       allSubmissions: [],
-      // Artist updates from Firestore (keyed by artist).
       artistAdditions: {},
-      // Local status selections & comments for Additions.
       artistStatuses: {},
       artistComments: {},
-      // Agenda view toggle.
       showAgenda: false,
-      // Search term.
       searchTerm: ""
     };
   },
   computed: {
-    // Helper to format a Date object to local string "YYYY/MM/DD"
+    // Helper: Format a Date object into a string "YYYY/MM/DD"
     formatLocalDate() {
       return (date) => {
         const year = date.getFullYear();
@@ -466,13 +375,13 @@ export default {
         return `${year}/${month}/${day}`;
       };
     },
-    // Compute the next meeting date as a string "YYYY/MM/DD".
+    // Compute the next meeting date (raw) as a string "YYYY/MM/DD".
     // Rules:
     // - If today is Tuesday (2) or Friday (5), return today's date.
-    // - Otherwise, compute the offset to next Tuesday and next Friday, pick the smaller.
+    // - Otherwise, compute offsets to next Tuesday and next Friday and choose the smallest.
     nextMeetingDateRaw() {
       const today = new Date();
-      const day = today.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+      const day = today.getDay();
       if (day === 2 || day === 5) {
         return this.formatLocalDate(today);
       }
@@ -482,15 +391,12 @@ export default {
       const meetingDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + meetingOffset);
       return this.formatLocalDate(meetingDate);
     },
-    // Compute the display string for the next meeting.
-    // If the computed next meeting date equals today's local date, display "Today",
-    // otherwise display the formatted date (e.g. "Fri, 02/07").
+    // Compute display string: "Today" if the computed date equals today's local date, otherwise formatted.
     nextMeetingDisplay() {
       const todayStr = this.formatLocalDate(new Date());
       if (this.nextMeetingDateRaw === todayStr) {
         return "Today";
       } else {
-        // Parse our local date string into a Date object.
         const parts = this.nextMeetingDateRaw.split("/");
         const d = new Date(parts[0], parts[1] - 1, parts[2]);
         return d.toLocaleDateString("en-US", {
@@ -710,12 +616,10 @@ export default {
       try {
         const docId = artist.toLowerCase();
         const docRef = doc(db, "artistAdditions", docId);
-        const statusValue =
-          this.artistStatuses[artist] ||
-          ("Added on " + this.getEarliestAdditionDate(this.allParsedAdditions[artist] || []));
         const updateObj = {
-          status: statusValue,
+          status: this.artistStatuses[artist] || ("Added on " + this.getEarliestAdditionDate(this.allParsedAdditions[artist] || [])),
           comment: this.artistComments[artist],
+          contributor: this.selectedName ? this.selectedName.name : "Anonymous",
           date: new Date().toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
@@ -774,7 +678,6 @@ export default {
       return "";
     },
     formatHeaderDate(dateStr) {
-      // dateStr is in "YYYY/MM/DD" format. Parse it into a Date object.
       const parts = dateStr.split("/");
       const d = new Date(parts[0], parts[1] - 1, parts[2]);
       return d.toLocaleDateString("en-US", { weekday: "short", month: "2-digit", day: "2-digit" });
@@ -797,7 +700,6 @@ export default {
   },
   async mounted() {
     document.addEventListener("click", this.handleClickOutside);
-    // Set selectedDate to our computed next meeting date.
     if (!this.selectedDate) {
       this.selectedDate = this.nextMeetingDateRaw;
     }
