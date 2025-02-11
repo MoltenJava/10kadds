@@ -514,6 +514,7 @@ export default {
         { name: 'Bayley', color: '#4ADE80', submitted: false },
         { name: 'Anthony', color: '#34D399', submitted: false },
         { name: 'Sami', color: '#9333EA', submitted: false },
+        { name: 'Porter', color: '#6366F1', submitted: false },
       ],
       selectedName: null,
       nameDropdownOpen: false,
@@ -594,7 +595,7 @@ export default {
           const lines = sub.newAdditions.split(/\r?\n/).filter((line) => line.trim() !== '')
           let parsedCount = 0
           lines.forEach((line) => {
-            if (line.trim().match(/^(.+?):\s*(.+)$/)) {
+            if (line.trim().match(/^(.+?)\s*(?::|-)\s*(.+)$/)) {
               parsedCount++
             }
           })
