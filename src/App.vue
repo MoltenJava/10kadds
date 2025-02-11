@@ -512,6 +512,8 @@ export default {
         { name: 'Akiva', color: '#F472B6', submitted: false },
         { name: 'Lucas', color: '#06B6D4', submitted: false },
         { name: 'Bayley', color: '#4ADE80', submitted: false },
+        { name: 'Anthony', color: '#34D399', submitted: false },
+        { name: 'Sami', color: '#9333EA', submitted: false },
       ],
       selectedName: null,
       nameDropdownOpen: false,
